@@ -1,8 +1,6 @@
 from datetime import datetime
 from datetime import timedelta
 
-now = datetime.now()
-
 class gameParty:
     def __init__(self, startTime, duration, maxUsers, owner, id = 0):
         self.startTime = startTime
@@ -13,6 +11,9 @@ class gameParty:
         self.users = []
         self.users.append(owner)
         self.id = id
+    
+    def getStartTime(self):
+        return self.startTime
 
     def partyInfo(self):
         print("Start :", self.startTime)
