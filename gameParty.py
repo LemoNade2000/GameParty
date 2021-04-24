@@ -22,20 +22,16 @@ class gameParty:
         print("Participants:", self.users)
 
     def partyJoin(self, joiner):
-        if(len(self.users) == self.maxUsers){
+        if len(self.users) == self.maxUsers :
             print("Too many users in this party.")
-            return -1;
-        }
-        else if(joiner in self.users){
+            return -1
+        
+        elif joiner in self.users :
             print("This user is already in the party.")
-            return -1;
-        }
-        else{
+            return -1
+        
+        else :
             self.users.append(joiner)
             print("Successfully joined the party.")
-        }
+        
 
-
-during = timedelta(seconds = 3600)
-party = gameParty(now, during, 5, "Me")
-party.partyInfo()
