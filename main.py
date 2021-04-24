@@ -38,4 +38,35 @@ async def view(ctx):
         embed.add_field(name ='from ' + party.startTime.strftime("%H:%M") + 'to ' + party.endTime.strftime("%H:%M"), value = party.owner.name + '\t' + '(' + str(len(party.users)) + '/' + str(party.maxUsers) + ')', inline = False)
     await ctx.send(embed = embed)
 
+
+@bot.command(name='join', help = 'User can join the game party.', pass_context = True)
+async def join(ctx, partyID : int):
+    result = parties[partyID].partyJoin(ctx.message.author)
+    if result == -1 :
+        embed = discord.Embed(description = 'Error!')
+        embed.add_field(name = 'Reason', value = 'The party is currently full.')
+        await ctx.send(embed = embed)
+
+    elif result == -2 :
+        embed = discord.Embed(description = 'Error!')
+        embed.add_field(name = 'Reason', value = 'You are already in the party.')
+        await ctx.send(embed = embed) 
+
+    elif result == 0 :
+        embed = discord.Embed(description = 'Succesfully joined the party.')
+        member = ctx.message.author
+        avatar = member.avatar_url
+        embed.set_thumbnail(url = avatar)
+        listOfUsers = ''
+        for users in parties[partyID].users :
+            listOfUsers = listOfUsers + users.name + '\n'
+        embed.add_field(name= 'Participants', value = listOfUsers)
+        embed.add_field(name= 'Maximum Participants', value = parties[partyID].maxUsers)
+        ctx.send(embed = embed)
+
+
+    
+#@bot.command(name='leave', help = 'User can leave the game party', pass_context = True)
+#async def leave(ctx, partyID : int):
+
 bot.run(TOKEN)
