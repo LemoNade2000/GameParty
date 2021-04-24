@@ -29,10 +29,20 @@ class gameParty:
         
         elif joiner in self.users :
             print("This user is already in the party.")
-            return -1
+            return -2
         
         else :
             self.users.append(joiner)
             print("Successfully joined the party.")
+            return 0
+    
+    def partyLeave(self, leaver):
+        if leaver not in self.users :
+            print("User not in the party.")
+            return -1
         
+        else :
+            self.users.remove(leaver)
+            print("Successfully left the party.")
+            return 0
 
