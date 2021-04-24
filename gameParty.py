@@ -2,7 +2,8 @@ from datetime import datetime
 from datetime import timedelta
 
 class gameParty:
-    def __init__(self, startTime, duration, maxUsers, owner, id = 0):
+    partyID = 0
+    def __init__(self, startTime, duration, maxUsers, owner):
         self.startTime = startTime
         self.duration = duration
         self.endTime = startTime + duration
@@ -10,7 +11,8 @@ class gameParty:
         self.owner = owner
         self.users = []
         self.users.append(owner)
-        self.id = id
+        self.id = gameParty.partyID
+        gameParty.partyID = gameParty.partyID + 1
     
     def getStartTime(self):
         return self.startTime
@@ -45,4 +47,6 @@ class gameParty:
             self.users.remove(leaver)
             print("Successfully left the party.")
             return 0
+
+
 

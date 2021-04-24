@@ -17,7 +17,7 @@ parties = []
 async def create(ctx, start: int, duration: int, maxUsers):
     schedule = datetime.today()
     dur = timedelta(seconds=60 * duration)
-    party = gameParty(schedule.replace(hour= start // 100, minute= start % 100), dur, maxUsers, ctx.message.author, len(parties))
+    party = gameParty(schedule.replace(hour= start // 100, minute= start % 100), dur, maxUsers, ctx.message.author)
     parties.append(party)
     embed = discord.Embed(description = 'Succesfully created a game party.')
     member = ctx.message.author
@@ -62,11 +62,29 @@ async def join(ctx, partyID : int):
             listOfUsers = listOfUsers + users.name + '\n'
         embed.add_field(name= 'Participants', value = listOfUsers)
         embed.add_field(name= 'Maximum Participants', value = parties[partyID].maxUsers)
-        ctx.send(embed = embed)
+        await ctx.send(embed = embed)
 
 
     
-#@bot.command(name='leave', help = 'User can leave the game party', pass_context = True)
-#async def leave(ctx, partyID : int):
+@bot.command(name='leave', help = 'User can leave the game party', pass_context = True)
+async def leave(ctx, partyID : int):
+    result = parties[partyID].partyLeave(ctx.message.author)
+    if result == -1 :
+        embed = discord.Embed(description = 'Error!')
+        embed.add_field(name = 'Reason', value = 'You are not in the party')
+        await ctx.send(embed = embed)
+    
+    elif result == 0 :
+        embed = discord.Embed(description = 'Succesfully left the party.')
+        member = ctx.message.author
+        avatar = member.avatar_url
+        embed.set_thumbnail(url = avatar)
+        await ctx.send(embed = embed)
+    
+    if len(parties[partyID].users) == 0 :
+        parties.remove(parties[partyID])
+        return 0
+    
+    
 
 bot.run(TOKEN)
