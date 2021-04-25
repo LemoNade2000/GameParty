@@ -14,16 +14,17 @@ bot = commands.Bot(command_prefix = 'gaming ')
 parties = []
 
 @bot.command(name='create', help = 'User can join a game party', pass_context = True)
-async def create(ctx, start: int, duration: int, maxUsers):
+async def create(ctx, game, start: int, duration: int, maxUsers):
     schedule = datetime.today()
     dur = timedelta(seconds=60 * duration)
-    party = gameParty(schedule.replace(hour= start // 100, minute= start % 100), dur, maxUsers, ctx.message.author)
+    party = gameParty(game, schedule.replace(hour= start // 100, minute= start % 100), dur, maxUsers, ctx.message.author)
     parties.append(party)
     embed = discord.Embed(description = 'Succesfully created a game party.')
     member = ctx.message.author
     avatar = member.avatar_url
     embed.set_thumbnail(url = avatar)
     embed.add_field (name = 'Owner', value = party.owner.name)
+    embed.add_field(name = 'Game', value = party.game)
     embed.add_field (name = 'Schedule', value = party.startTime.strftime("%H:%M") + '~' + party.endTime.strftime("%H:%M"))
     embed.add_field (name = 'Maximum Participants', value = party.maxUsers, inline = False)
     embed.add_field (name = 'Party ID', value = party.id)
@@ -34,8 +35,11 @@ async def create(ctx, start: int, duration: int, maxUsers):
 async def view(ctx):
     sortedGameParties = sorted(parties, key = gameParty.getStartTime)
     embed = discord.Embed(Title = 'Game Parties', description = 'Ongoing game Parties')
-    for party in sortedGameParties :
-        embed.add_field(name ='from ' + party.startTime.strftime("%H:%M") + 'to ' + party.endTime.strftime("%H:%M"), value = party.owner.name + '\t' + '(' + str(len(party.users)) + '/' + str(party.maxUsers) + ')', inline = False)
+    for party in sortedGameParties:
+        embed.add_field(name = 'Party ' + str(party.id), value = party.game + '\t' + 
+        party.startTime.strftime("%H:%M") + '~' + party.endTime.strftime("%H:%M") +'\n' +
+        str(len(party.users)) + '\/' + str(party.maxUsers), inline = False)
+    
     await ctx.send(embed = embed)
 
 
@@ -84,7 +88,24 @@ async def leave(ctx, partyID : int):
     if len(parties[partyID].users) == 0 :
         parties.remove(parties[partyID])
         return 0
-    
-    
 
+@bot.command(name='info', help = 'Displays party information.')
+async def info(ctx, partyID : int):
+    try:
+        parties[partyID]
+    except IndexError:
+        embed = discord.Embed(description = 'Error!')
+        embed.add_field(name = 'Reason', value = 'Party with corresponding ID does not exist.')
+        await ctx.send(embed = embed)
+        
+    embed = discord.Embed(description = parties[partyID].owner.name + '\'s game party.')
+    listOfUsers = ''
+    for users in parties[partyID].users :
+        listOfUsers = listOfUsers + users.name + '\n'
+    embed.add_field(name = 'Members', value = listOfUsers)
+    embed.add_field(name = 'Schedule', value = 'from ' + parties[partyID].startTime.strftime("%H:%M") + 'to ' + parties[partyID].endTime.strftime("%H:%M"))
+    embed.set_thumbnail(url = parties[partyID].owner.avatar_url)
+    await ctx.send(embed = embed)
+
+    
 bot.run(TOKEN)

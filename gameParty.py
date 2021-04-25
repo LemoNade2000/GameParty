@@ -3,10 +3,11 @@ from datetime import timedelta
 
 class gameParty:
     partyID = 0
-    def __init__(self, startTime, duration, maxUsers, owner):
+    def __init__(self, game, startTime, duration, maxUsers, owner):
         self.startTime = startTime
         self.duration = duration
         self.endTime = startTime + duration
+        self.game = game
         self.maxUsers = maxUsers
         self.owner = owner
         self.users = []
