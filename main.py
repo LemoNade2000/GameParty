@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from datetime import datetime
 from datetime import timedelta
 from gameParty import gameParty
+import time
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -31,8 +32,19 @@ async def create(ctx, game, start: int, duration: int, maxUsers):
     await ctx.send(embed = embed)
     
 
-@bot.command(name='view', help = 'User can see how many parties there are.', pass_context = True) 
-async def view(ctx):
+@bot.command(name='view', help = 'Displays all existing game parties.', pass_context = True) 
+async def view(ctx, game = None):
+    if game is not None :
+        sortedGameParties = sorted(parties, key = gameParty.getStartTime)
+        embed = discord.Embed(Title = 'Game Parties', description = 'Ongoing game Parties')
+        for party in sortedGameParties:
+            if party.game == game :
+                embed.add_field(name = 'Party ' + str(party.id), value = party.game + '\t' + 
+                party.startTime.strftime("%H:%M") + '~' + party.endTime.strftime("%H:%M") +'\n' +
+                str(len(party.users)) + '\/' + str(party.maxUsers), inline = False)
+        await ctx.send(embed = embed)
+    
+    await ctx.send(embed = embed)        
     sortedGameParties = sorted(parties, key = gameParty.getStartTime)
     embed = discord.Embed(Title = 'Game Parties', description = 'Ongoing game Parties')
     for party in sortedGameParties:
@@ -42,13 +54,22 @@ async def view(ctx):
     
     await ctx.send(embed = embed)
 
-
 @bot.command(name='join', help = 'User can join the game party.', pass_context = True)
 async def join(ctx, partyID : int):
     result = parties[partyID].partyJoin(ctx.message.author)
     if result == -1 :
+        parties[partyID].spareUsers.append(ctx.message.author)
         embed = discord.Embed(description = 'Error!')
-        embed.add_field(name = 'Reason', value = 'The party is currently full.')
+        embed.add_field(name = 'Reason', value = 'The party is currently full. You are joined as a backup!')
+        await ctx.send(embed = embed)
+        member = ctx.message.author
+        avatar = member.avatar_url
+        embed.set_thumbnail(url = avatar)
+        listOfUsers = ''
+        for users in parties[partyID].users :
+            listOfUsers = listOfUsers + users.name + '\n'
+        embed.add_field(name= 'Participants', value = listOfUsers)
+        embed.add_field(name= 'Maximum Participants', value = parties[partyID].maxUsers)
         await ctx.send(embed = embed)
 
     elif result == -2 :
@@ -106,6 +127,11 @@ async def info(ctx, partyID : int):
     embed.add_field(name = 'Schedule', value = 'from ' + parties[partyID].startTime.strftime("%H:%M") + 'to ' + parties[partyID].endTime.strftime("%H:%M"))
     embed.set_thumbnail(url = parties[partyID].owner.avatar_url)
     await ctx.send(embed = embed)
-
-    
+'''
+def update():
+    nexttime = time.time()
+    while True:
+        #Get rid of finished game parties
+        #Mention users of game party befre 10 min, and start.
+        '''
 bot.run(TOKEN)

@@ -13,6 +13,7 @@ class gameParty:
         self.users = []
         self.users.append(owner)
         self.id = gameParty.partyID
+        self.spareUsers = []
         gameParty.partyID = gameParty.partyID + 1
     
     def getStartTime(self):
@@ -30,7 +31,7 @@ class gameParty:
             print("Too many users in this party.")
             return -1
         
-        elif joiner in self.users :
+        elif joiner in self.users or joiner in self.spareUsers:
             print("This user is already in the party.")
             return -2
         
@@ -40,13 +41,21 @@ class gameParty:
             return 0
     
     def partyLeave(self, leaver):
-        if leaver not in self.users :
+        if leaver not in self.users and leaver not in self.spareUsers:
             print("User not in the party.")
             return -1
         
-        else :
+        elif leaver in self.users :
             self.users.remove(leaver)
             print("Successfully left the party.")
+            if len(self.spareUsers) > 0 :
+                x = self.spareUsers[0]
+                self.users.append(x)
+                self.spareUsers.remove(x)
+            return 0
+
+        elif leaver in self.spareUsers :
+            self.spareUsers.remove(leaver)
             return 0
 
 
