@@ -1,4 +1,4 @@
-# gameParty
+# GameParty
 Discord bot that allows gamers in the server to group up and party! 
 
 Features to Develop.
