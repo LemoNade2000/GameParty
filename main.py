@@ -43,16 +43,16 @@ async def view(ctx, game = None):
                 party.startTime.strftime("%H:%M") + '~' + party.endTime.strftime("%H:%M") +'\n' +
                 str(len(party.users)) + '\/' + str(party.maxUsers), inline = False)
         await ctx.send(embed = embed)
-    
-    await ctx.send(embed = embed)        
-    sortedGameParties = sorted(parties, key = gameParty.getStartTime)
-    embed = discord.Embed(Title = 'Game Parties', description = 'Ongoing game Parties')
-    for party in sortedGameParties:
-        embed.add_field(name = 'Party ' + str(party.id), value = party.game + '\t' + 
-        party.startTime.strftime("%H:%M") + '~' + party.endTime.strftime("%H:%M") +'\n' +
-        str(len(party.users)) + '\/' + str(party.maxUsers), inline = False)
-    
-    await ctx.send(embed = embed)
+
+    else :       
+        sortedGameParties = sorted(parties, key = gameParty.getStartTime)
+        embed = discord.Embed(Title = 'Game Parties', description = 'Ongoing game Parties')
+        for party in sortedGameParties:
+            embed.add_field(name = 'Party ' + str(party.id), value = party.game + '\t' + 
+            party.startTime.strftime("%H:%M") + '~' + party.endTime.strftime("%H:%M") +'\n' +
+            str(len(party.users)) + '\/' + str(party.maxUsers), inline = False)
+        
+        await ctx.send(embed = embed)
 
 @bot.command(name='join', help = 'User can join the game party.', pass_context = True)
 async def join(ctx, partyID : int):
